@@ -1,2 +1,4 @@
 hello world i am a new git user
+hi i write from new branch branch
+hello world i am a new git user
 this is added from the master branch
