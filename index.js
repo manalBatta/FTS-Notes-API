@@ -1,11 +1,14 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const Note = require("./models/Note"); //table or collection
 const cors = require("cors");
 
-mongoose
+const dbPass = process.env.DB_PASS;
+const dbUser = process.env.DB_KEY;
+const userName = mongoose
   .connect(
-    "mongodb+srv://manalbatta1234:1234@cluster0.uobcq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    `mongodb+srv://${dbUser}:${dbPass}@cluster0.uobcq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
   )
   .then(() => {
     console.log("connected successfully");
