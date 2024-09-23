@@ -1,12 +1,12 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const Note = require("./models/Note"); //table or collection
+const Note = require("./models/Note");
 const cors = require("cors");
 
 const dbPass = process.env.DB_PASS;
 const dbUser = process.env.DB_KEY;
-const userName = mongoose
+mongoose
   .connect(
     `mongodb+srv://${dbUser}:${dbPass}@cluster0.uobcq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
   )
@@ -25,12 +25,11 @@ app.listen(3333, () => {
   console.log("listen on port 3333");
 });
 
-// Secure POST endpoint to add a new note
-app.post("/addNewNote", async (req, res) => {
+// POST /notes - Add a new note
+app.post("/notes", async (req, res) => {
   try {
     const { title, content } = req.body;
 
-    // Check if required fields are provided
     if (!title || !content) {
       return res.status(400).send("Title and content are required");
     }
@@ -49,8 +48,8 @@ app.post("/addNewNote", async (req, res) => {
   }
 });
 
-// Secure GET endpoint to retrieve all notes
-app.get("/getNotes", async (req, res) => {
+// GET /notes - Retrieve all notes
+app.get("/notes", async (req, res) => {
   try {
     const notes = await Note.find();
     res.status(200).json(notes);
@@ -60,17 +59,12 @@ app.get("/getNotes", async (req, res) => {
   }
 });
 
-// Secure GET endpoint to retrieve a note by ID
-app.get("/getNoteById", async (req, res) => {
+// GET /notes/:id - Retrieve a note by ID
+app.get("/notes/:id", async (req, res) => {
   try {
-    const id = req.query.id;
-
-    if (!id) {
-      return res.status(400).send("Note ID is required");
-    }
+    const { id } = req.params;
 
     const note = await Note.findById(id);
-
     if (!note) {
       return res.status(404).send("Note not found");
     }
@@ -82,17 +76,12 @@ app.get("/getNoteById", async (req, res) => {
   }
 });
 
-// Secure DELETE endpoint to delete a note
-app.delete("/deleteNote", async (req, res) => {
+// DELETE /notes/:id - Delete a note by ID
+app.delete("/notes/:id", async (req, res) => {
   try {
-    const id = req.query.id;
-
-    if (!id) {
-      return res.status(400).send("Note ID is required");
-    }
+    const { id } = req.params;
 
     const note = await Note.findByIdAndDelete(id);
-
     if (!note) {
       return res.status(404).send("Note not found");
     }
@@ -104,13 +93,14 @@ app.delete("/deleteNote", async (req, res) => {
   }
 });
 
-// Secure PUT endpoint to update a note
-app.put("/updateNote", async (req, res) => {
+// PUT /notes/:id - Update a note by ID
+app.put("/notes/:id", async (req, res) => {
   try {
-    const { id, title, content } = req.body;
+    const { id } = req.params;
+    const { title, content } = req.body;
 
-    if (!id || !title || !content) {
-      return res.status(400).send("ID, title, and content are required");
+    if (!title || !content) {
+      return res.status(400).send("Title and content are required");
     }
 
     const note = await Note.findByIdAndUpdate(
