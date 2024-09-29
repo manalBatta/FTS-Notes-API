@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const Note = require("./models/Note");
+const Note = require("../models/Note");
 const cors = require("cors");
 
 const dbPass = process.env.DB_PASS;
@@ -20,10 +20,6 @@ mongoose
 const app = express();
 app.use(express.json());
 app.use(cors());
-
-app.listen(3333, () => {
-  console.log("listen on port 3333");
-});
 
 // POST /notes - Add a new note
 app.post("/notes", async (req, res) => {
@@ -118,4 +114,8 @@ app.put("/notes/:id", async (req, res) => {
     console.error(error);
     res.status(500).send("Error updating note");
   }
+});
+
+app.listen(3000, () => {
+  console.log("listen on port 3333");
 });
