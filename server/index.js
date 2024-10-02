@@ -26,6 +26,7 @@ app.post("/notes", async (req, res) => {
   try {
     const { title, content } = req.body;
 
+    console.log(req.body);
     if (!title || !content) {
       return res.status(400).send("Title and content are required");
     }
@@ -116,6 +117,6 @@ app.put("/notes/:id", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
+app.listen(3333, () => {
   console.log("listen on port 3333");
 });

@@ -1,10 +1,15 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-import Note from "./components/Note";
-import { Title } from "chart.js";
+import Note from "./components/Note/Note";
+import AddNote from "./components/AddNote/AddNote";
+// import { Title } from "chart.js";
 
 function App() {
   const [notes, setNotes] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  let bgColor = false;
+
   useEffect(() => {
     const getNotes = async () => {
       const response = await fetch("/notes");
@@ -13,64 +18,58 @@ function App() {
       }
       const notes = await response.json();
       console.log(notes);
-      setNotes(notes);
+      setNotes(notes.reverse());
     };
     getNotes();
-  }, []);
-  let bgColor = false;
+  }, [refresh]);
+
+  //search implementation
+  const handleSearch = (Event) => {
+    let searchValue = Event.target.value.trim();
+    console.log(searchValue);
+
+    if (searchValue === "") {
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    const searchResult = notes.map((note) => {
+      const text = note.content + " " + note.title;
+      if (text.includes(searchValue.toLowerCase()))
+        return { ...note, isSearch: true };
+      return { ...note, isSearch: false };
+    });
+    setNotes(searchResult);
+  };
   return (
     <>
       <h1 className="heading">My Notes Keeper</h1>
       <div className="searchContainer">
-        <input type="text" placeholder="🔍Search" className="search" />
+        <input
+          type="text"
+          placeholder="🔍Search"
+          className="search"
+          onChange={handleSearch}
+        />
       </div>
       <div className="notesContainer">
-        <Note
-          note={{
-            title: "Take a note..",
-            creationDate: "",
-            content: "The cake is delecious",
-          }}></Note>
-        {notes.length &&
+        <AddNote refresh={setRefresh}></AddNote>
+        {notes.length > 0 &&
           notes.map((note) => {
             bgColor = !bgColor;
-            return <Note note={{ ...note, bgColor }}></Note>;
+            const noteComponent = (
+              <Note
+                note={{ ...note, bgColor }}
+                refresh={setRefresh}
+                key={note._id}></Note>
+            );
+            if (isSearching) {
+              return note.isSearch ? noteComponent : "";
+            }
+            return noteComponent;
           })}
       </div>
     </>
-    // <table>
-    //   <thead>
-    //     <tr>
-    //       <th className="head">Notes</th>
-    //     </tr>
-    //   </thead>
-    //   <tbody>
-    //     {" "}
-    //     <tr>
-    //       {notes.length > 0 &&
-    //         notes.map((note) => {
-    //           return (
-    //             <>
-    //               <td className="title">{note.title}</td>
-    //               <td>{note.content}</td>
-    //               <td>{note.creationDate}</td>
-    //               <td>
-    //                 <button className="delete btn">🗑️</button>
-    //               </td>
-    //             </>
-    //           );
-    //         })}
-    //     </tr>
-    //     <tr>
-    //       <td></td>
-    //       <td></td>
-    //       <td></td>
-    //       <td>
-    //         <button className="add btn">Add</button>
-    //       </td>
-    //     </tr>
-    //   </tbody>
-    // </table>
   );
 }
 

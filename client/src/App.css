@@ -30,5 +30,6 @@ body {
     height: 100vh;
     padding: 12% 16%;
     grid-template-columns: repeat(3, 1fr);
+    row-gap: 23px;
   }
 }
