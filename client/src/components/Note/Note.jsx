@@ -2,7 +2,7 @@ import "../Note.css";
 
 const yellow = "#F4D799";
 const pink = "#FFF0EE";
-export default function Note({ note, refresh }) {
+export default function Note({ note, refresh, onClick }) {
   function handleDelete(id) {
     const confirmDelete = window.confirm("Are you sure");
     if (!confirmDelete) return;
@@ -23,6 +23,7 @@ export default function Note({ note, refresh }) {
   }
   return (
     <div
+      onClick={() => onClick(note._id)}
       className="noteContainer"
       style={{ backgroundColor: note.bgColor ? pink : yellow }}>
       <h2 className="noteHeader">{note.title}</h2>

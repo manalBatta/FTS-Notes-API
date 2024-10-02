@@ -1,0 +1,51 @@
+.UpdateContainer {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(0, 0, 0, 0.392);
+  .updateForm {
+    width: 400px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    background-color: #f4d799;
+    box-sizing: border-box;
+    border-radius: 24px;
+    border: 4px solid #33322e;
+
+    .title,
+    .noteContent {
+      border: none;
+      padding: 10px;
+      background-color: transparent;
+    }
+    .title {
+      border-bottom: 4px solid #33322e;
+    }
+    .noteContent {
+      height: 90px;
+      margin: 2px;
+      resize: none;
+      scrollbar-width: 0;
+    }
+    .submit {
+      border: 4px solid #33322e;
+      background-color: aliceblue;
+      padding: 10px;
+      width: 70px;
+      border-radius: 24px;
+      margin: 10px auto;
+      display: inline;
+    }
+    .cancel {
+      background-color: rgb(251, 130, 130);
+    }
+  }
+}

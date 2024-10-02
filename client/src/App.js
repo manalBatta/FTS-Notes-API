@@ -2,12 +2,14 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import Note from "./components/Note/Note";
 import AddNote from "./components/AddNote/AddNote";
+import Form from "./components/Form/Form";
 // import { Title } from "chart.js";
 
 function App() {
   const [notes, setNotes] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [update, setUpdate] = useState({});
   let bgColor = false;
 
   useEffect(() => {
@@ -19,6 +21,7 @@ function App() {
       const notes = await response.json();
       console.log(notes);
       setNotes(notes.reverse());
+      setUpdate({});
     };
     getNotes();
   }, [refresh]);
@@ -41,6 +44,11 @@ function App() {
     });
     setNotes(searchResult);
   };
+
+  const handleClick = (id) => {
+    const clicked = notes.filter((note) => note._id == id)[0];
+    setUpdate(clicked);
+  };
   return (
     <>
       <h1 className="heading">My Notes Keeper</h1>
@@ -59,6 +67,7 @@ function App() {
             bgColor = !bgColor;
             const noteComponent = (
               <Note
+                onClick={handleClick}
                 note={{ ...note, bgColor }}
                 refresh={setRefresh}
                 key={note._id}></Note>
@@ -69,6 +78,12 @@ function App() {
             return noteComponent;
           })}
       </div>
+      {Object.keys(update) != 0 && (
+        <Form
+          noteProp={{ ...update }}
+          finishUpdate={setUpdate}
+          refresh={setRefresh}></Form>
+      )}
     </>
   );
 }

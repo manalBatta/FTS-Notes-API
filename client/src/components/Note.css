@@ -5,6 +5,7 @@
   width: 276px;
   height: 296px;
   border: 4px solid #33322e;
+  min-height: fit-content;
   .noteHeader {
     margin: 0;
     padding: 5px 0 5px 15px;

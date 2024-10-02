@@ -25,8 +25,6 @@ app.use(cors());
 app.post("/notes", async (req, res) => {
   try {
     const { title, content } = req.body;
-
-    console.log(req.body);
     if (!title || !content) {
       return res.status(400).send("Title and content are required");
     }
