@@ -37,7 +37,7 @@ function App() {
     }
     setIsSearching(true);
     const searchResult = notes.map((note) => {
-      const text = note.content + " " + note.title;
+      const text = (note.content + " " + note.title).toLowerCase();
       if (text.includes(searchValue.toLowerCase()))
         return { ...note, isSearch: true };
       return { ...note, isSearch: false };

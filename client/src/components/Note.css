@@ -17,9 +17,10 @@
     height: 41%;
   }
   .creationDate {
-    color: #b9b8b8;
+    color: #8ccfff;
     float: left;
     font-size: 0.75rem;
+    margin-left: 15px;
   }
   .btn {
     float: right;
