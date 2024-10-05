@@ -1,28 +1,42 @@
 import { useState } from "react";
 import "./Form.css";
+import Snackbar from "@mui/material/Snackbar";
 
-export default function ({ noteProp, finishUpdate, refresh }) {
+export default function ({ noteProp, refresh }) {
   const [note, setNote] = useState(noteProp);
-  function handleSubmit(E) {
-    E.preventDefault();
-    try {
-      fetch("/notes/" + note._id, {
-        method: "put",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(note),
-      }).then(() => {
+  const [open, setOpen] = useState(false);
+
+  function handleSubmit(Event) {
+    Event.preventDefault();
+    const updateNote = async () => {
+      try {
+        const response = await fetch("/notes/" + note._id, {
+          method: "put",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(note),
+        });
+        if (!response.ok) {
+          setOpen(true);
+          throw new Error("Error updating note ");
+        }
         refresh((r) => !r);
         alert("updated note !");
-      });
-    } catch (error) {
-      console.log(error);
-    }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    updateNote();
   }
 
   return (
     <div className="UpdateContainer">
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        message="Error:Note is not added"
+      />
       <form className="updateForm">
         <input
           value={note.title}

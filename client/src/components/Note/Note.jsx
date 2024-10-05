@@ -3,23 +3,29 @@ import "../Note.css";
 const yellow = "#F4D799";
 const pink = "#FFF0EE";
 export default function Note({ note, refresh, onClick }) {
-  function handleDelete(id) {
-    const confirmDelete = window.confirm("Are you sure");
+  function handleDelete(Event, id) {
+    Event.stopPropagation();
+    const confirmDelete = window.confirm(
+      "Are you sure You want to delete ",
+      note.title
+    );
     if (!confirmDelete) return;
-    try {
-      fetch("/notes/" + id, {
-        method: "delete",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then((res) => {
-        if (res.ok) {
+    const deleteNote = async () => {
+      try {
+        const response = await fetch("/notes/" + id, {
+          method: "delete",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.ok) {
           refresh((r) => !r);
         }
-      });
-    } catch (error) {
-      console.log(error);
-    }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    deleteNote();
   }
   return (
     <div
@@ -29,7 +35,9 @@ export default function Note({ note, refresh, onClick }) {
       <h2 className="noteHeader">{note.title}</h2>
       <p className="noteBody">{note.content}</p>
       <span className="creationDate">🗓️{note.creationDate.slice(0, 7)}</span>
-      <button className="btn" onClick={() => handleDelete(note._id)}>
+      <button
+        className="btn"
+        onClick={(Event) => handleDelete(Event, note._id)}>
         ⛔
       </button>
     </div>
