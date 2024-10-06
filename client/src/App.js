@@ -32,6 +32,14 @@ function App() {
     getNotes();
   }, [refresh]);
 
+  const handleClose = (event, reason) => {
+    // this condition will prevent dissapering Snackbar when clicking away
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
   //search implementation
   const handleSearch = (Event) => {
     let searchValue = Event.target.value.trim();
@@ -39,9 +47,10 @@ function App() {
       setIsSearching(false);
       return;
     }
+    console.log("started searching");
     setIsSearching(true);
     setNotes((prev) => {
-      prev.map((note) => {
+      return prev.map((note) => {
         const text = (note.content + " " + note.title).toLowerCase();
         const isSearch = text.includes(searchValue.toLowerCase());
         return { ...note, isSearch: isSearch };
@@ -59,6 +68,7 @@ function App() {
   return (
     <>
       <Snackbar
+        onClose={handleClose}
         open={open}
         autoHideDuration={6000}
         message="Server Error try again later"

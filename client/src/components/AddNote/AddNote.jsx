@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import "../Note.css";
 import Snackbar from "@mui/material/Snackbar";
 
@@ -39,7 +39,7 @@ const styles = {
 const today = new Date();
 const monthYear = today.getMonth() + 1 + "-" + today.getFullYear();
 
-export default function AddNote({ refresh }) {
+const AddNote = memo(({ refresh }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [noteInfo, setNotInfo] = useState({ title: "", content: "" });
   const [open, setOpen] = useState(false);
@@ -89,7 +89,8 @@ export default function AddNote({ refresh }) {
       }}>
       <Snackbar
         open={open}
-        autoHideDuration={6000}
+        onClose={() => setOpen(false)}
+        autoHideDuration={4000}
         message="Error:Note is not added"
       />
       <input
@@ -133,4 +134,6 @@ export default function AddNote({ refresh }) {
       )}
     </div>
   );
-}
+});
+
+export default AddNote;
