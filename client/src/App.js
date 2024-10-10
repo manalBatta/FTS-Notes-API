@@ -47,7 +47,6 @@ function App() {
       setIsSearching(false);
       return;
     }
-    console.log("started searching");
     setIsSearching(true);
     setNotes((prev) => {
       return prev.map((note) => {
@@ -64,6 +63,8 @@ function App() {
     const clicked = notes.filter((note) => note._id == id)[0];
     setUpdate(clicked);
   };
+
+  const filteredNotes = notes.filter((note) => note.isSearch);
 
   return (
     <>
@@ -84,20 +85,17 @@ function App() {
       </div>
       <div className="notesContainer">
         <AddNote refresh={setRefresh}></AddNote>
-        {notes?.length > 0 &&
-          notes.map((note) => {
+        {(isSearching ? filteredNotes : notes)?.length > 0 &&
+          (isSearching ? filteredNotes : notes).map((note) => {
             bgColor = !bgColor;
-            const noteComponent = (
+            return (
               <Note
                 onClick={handleClick}
                 note={{ ...note, bgColor }}
                 refresh={setRefresh}
-                key={note._id}></Note>
+                key={note._id}
+              />
             );
-            if (isSearching) {
-              return note.isSearch ? noteComponent : "";
-            }
-            return noteComponent;
           })}
       </div>
       {Object.keys(update).length !== 0 && (
