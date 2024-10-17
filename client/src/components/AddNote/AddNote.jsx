@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import "../Note.css";
 import Snackbar from "@mui/material/Snackbar";
-
+import { addNote } from "../API";
 const styles = {
   header: {
     backgroundColor: "transparent",
@@ -9,6 +9,8 @@ const styles = {
     border: "none",
     width: "100%",
     borderBottom: "4px solid #33322e",
+    fontSize: " 1.2rem",
+    fontWeight: "700",
   },
 
   noteBody: {
@@ -19,7 +21,9 @@ const styles = {
     border: "none",
     resize: "none",
     scrollbarWidth: "none",
+    fontSize: " 1rem",
   },
+
   calender: {
     top: "1%",
   },
@@ -39,45 +43,36 @@ const styles = {
 const today = new Date();
 const monthYear = today.getMonth() + 1 + "-" + today.getFullYear();
 
-const AddNote = memo(({ refresh }) => {
-  const [isAdding, setIsAdding] = useState(false);
+const AddNote = memo(({ refreshPage }) => {
+  const [shouldShowContent, setShouldShowContent] = useState(false);
   const [noteInfo, setNotInfo] = useState({ title: "", content: "" });
-  const [open, setOpen] = useState(false);
+  const [isSnackOpen, setIsSnackOpen] = useState(false);
 
-  function addNote() {
-    const addNote = async () => {
-      try {
-        const res = await fetch("/notes", {
-          method: "post",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(noteInfo),
-        });
-        if (!res.ok) {
-          setOpen(true);
-          throw new Error("Error post request ");
-        }
-        setOpen(false);
-        alert("new note added");
-        handleCancel();
-      } catch (error) {
-        console.log(error);
+  const addNoteClick = async () => {
+    try {
+      const res = await addNote(noteInfo);
+      if (!res.ok) {
+        setIsSnackOpen(true);
+        throw new Error("Error post request ");
       }
-      refresh((r) => !r);
-    };
-    addNote();
-  }
+      setIsSnackOpen(false);
+      alert("new note added");
+      handleCancel();
+    } catch (error) {
+      console.log(error);
+    }
+    refreshPage();
+  };
 
   const handleShrink = () => {
     if (noteInfo.title.length === 0) {
-      setIsAdding(false);
+      setShouldShowContent(false);
     }
   };
 
   const handleCancel = () => {
     setNotInfo({ title: "", content: "" });
-    setIsAdding(false);
+    setShouldShowContent(false);
   };
 
   return (
@@ -85,28 +80,28 @@ const AddNote = memo(({ refresh }) => {
       className="noteContainer"
       style={{
         backgroundColor: "rgb(190 255 247)",
-        height: isAdding ? "300px" : "66px",
+        height: shouldShowContent ? "300px" : "66px",
       }}>
       <Snackbar
-        open={open}
-        onClose={() => setOpen(false)}
+        open={isSnackOpen}
+        onClose={() => setIsSnackOpen(false)}
         autoHideDuration={4000}
         message="Error:Note is not added"
       />
       <input
         value={noteInfo.title}
         onChange={(E) => setNotInfo({ ...noteInfo, title: E.target.value })}
-        onFocus={() => setIsAdding(true)}
+        onFocus={() => setShouldShowContent(true)}
         onBlur={handleShrink}
         type="text"
         placeholder="Take a note.."
         className="noteHeader"
         style={{
           ...styles.header,
-          borderBottom: isAdding ? "4px solid #33322e" : "none",
+          borderBottom: shouldShowContent ? "4px solid #33322e" : "none",
         }}
       />
-      {isAdding && (
+      {shouldShowContent && (
         <>
           <textarea
             value={noteInfo.content}
@@ -127,7 +122,7 @@ const AddNote = memo(({ refresh }) => {
 
           <button
             style={{ ...styles.btn, backgroundColor: "#9cd2ff" }}
-            onClick={addNote}>
+            onClick={addNoteClick}>
             Add
           </button>
         </>

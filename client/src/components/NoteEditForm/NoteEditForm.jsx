@@ -1,39 +1,31 @@
 import { useState } from "react";
-import "./Form.css";
+import "./NoteEditForm.css";
 import Snackbar from "@mui/material/Snackbar";
+import { updateNote } from "../API";
 
-export default function ({ noteProp, refresh }) {
+export default function NoteEditForm({ noteProp, refreshPage }) {
   const [note, setNote] = useState(noteProp);
-  const [open, setOpen] = useState(false);
+  const [isSnackOpen, setIsSnackOpen] = useState(false);
 
-  function handleSubmit(Event) {
-    Event.preventDefault();
-    const updateNote = async () => {
-      try {
-        const response = await fetch("/notes/" + note._id, {
-          method: "put",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(note),
-        });
-        if (!response.ok) {
-          setOpen(true);
-          throw new Error("Error updating note ");
-        }
-        refresh((r) => !r);
-        alert("updated note !");
-      } catch (error) {
-        console.log(error);
+  const handleSubmitUpdate = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await updateNote(note);
+      if (!response.ok) {
+        setIsSnackOpen(true);
+        throw new Error("Error updating note ");
       }
-    };
-    updateNote();
-  }
+      refreshPage();
+      alert("updated note !");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="UpdateContainer">
       <Snackbar
-        open={open}
+        open={isSnackOpen}
         autoHideDuration={6000}
         message="Error:Note is not added"
       />
@@ -54,9 +46,15 @@ export default function ({ noteProp, refresh }) {
             type="submit"
             value={"update"}
             className="submit"
-            onClick={handleSubmit}
+            onClick={handleSubmitUpdate}
           />
-          <button className="submit cancel">cancel</button>
+          <button
+            className="submit cancel"
+            onClick={() => {
+              refreshPage();
+            }}>
+            cancel
+          </button>
         </div>
       </form>
     </div>

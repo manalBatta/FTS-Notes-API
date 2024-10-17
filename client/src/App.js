@@ -2,75 +2,57 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import Note from "./components/Note/Note";
 import AddNote from "./components/AddNote/AddNote";
-import Form from "./components/Form/Form";
 import Snackbar from "@mui/material/Snackbar";
+import { getNotesReq } from "./components/API";
 
 function App() {
   const [notes, setNotes] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [refresh, setRefresh] = useState(false);
-  const [update, setUpdate] = useState({});
-  const [open, setOpen] = useState(false);
+  const [isSnackOpen, setIsSnackOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   let bgColor = false;
 
-  useEffect(() => {
-    const getNotes = async () => {
-      try {
-        const response = await fetch("/notes");
-        if (!response.ok) {
-          setOpen(true);
-          throw new Error("could not fetch notes!");
-        }
-        setOpen(false);
-        const notes = await response.json();
-        setNotes(notes.reverse());
-        setUpdate({});
-      } catch (error) {
-        console.log(error);
+  const getNotes = async () => {
+    try {
+      const response = await getNotesReq();
+      if (!response.ok) {
+        setIsSnackOpen(true);
+        throw new Error("could not fetch notes!");
       }
-    };
+      setIsSnackOpen(false);
+      const notes = await response.json();
+      setNotes(notes.reverse());
+      // setUpdate({});
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
     getNotes();
-  }, [refresh]);
+  }, []);
 
-  const handleClose = (event, reason) => {
+  const handleCloseSnackbar = (reason) => {
     // this condition will prevent dissapering Snackbar when clicking away
     if (reason === "clickaway") {
       return;
     }
 
-    setOpen(false);
+    setIsSnackOpen(false);
   };
   //search implementation
-  const handleSearch = (Event) => {
-    let searchValue = Event.target.value.trim();
-    if (searchValue === "") {
-      setIsSearching(false);
-      return;
-    }
-    setIsSearching(true);
-    setNotes((prev) => {
-      return prev.map((note) => {
-        const text = (note.content + " " + note.title).toLowerCase();
-        const isSearch = text.includes(searchValue.toLowerCase());
-        return { ...note, isSearch: isSearch };
-      });
-    });
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value.trim());
   };
 
-  const handleClick = (id) => {
-    //update form shows when a note is deleted
-    //#solved : add a Event.preventPropagation on the delete button
-    const clicked = notes.filter((note) => note._id == id)[0];
-    setUpdate(clicked);
-  };
-
-  const filteredNotes = notes.filter((note) => note.isSearch);
+  const filteredNotes = notes.filter((note) => {
+    const text = (note.content + " " + note.title).toLowerCase();
+    return text.includes(searchValue.toLowerCase());
+  });
 
   return (
     <>
       <Snackbar
-        onClose={handleClose}
-        open={open}
+        onClose={handleCloseSnackbar}
+        open={isSnackOpen}
         autoHideDuration={6000}
         message="Server Error try again later"
       />
@@ -84,23 +66,19 @@ function App() {
         />
       </div>
       <div className="notesContainer">
-        <AddNote refresh={setRefresh}></AddNote>
-        {(isSearching ? filteredNotes : notes)?.length > 0 &&
-          (isSearching ? filteredNotes : notes).map((note) => {
+        <AddNote refreshPage={getNotes}></AddNote>
+        {filteredNotes?.length > 0 &&
+          filteredNotes.map((note) => {
             bgColor = !bgColor;
             return (
               <Note
-                onClick={handleClick}
                 note={{ ...note, bgColor }}
-                refresh={setRefresh}
+                refreshPage={getNotes}
                 key={note._id}
               />
             );
           })}
       </div>
-      {Object.keys(update).length !== 0 && (
-        <Form noteProp={update} refresh={setRefresh}></Form>
-      )}
     </>
   );
 }
